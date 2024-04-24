@@ -1,0 +1,48 @@
+import robocode.*;
+
+public class Mirakeia extends AdvancedRobot {
+    
+    public void run() {
+        // Definir cores do robô
+        setBodyColor(java.awt.Color.blue);
+        setGunColor(java.awt.Color.black);
+        setRadarColor(java.awt.Color.red);
+        setBulletColor(java.awt.Color.green);
+        setScanColor(java.awt.Color.yellow);
+
+        // Loop de comportamento principal
+        while (true) {
+            // Movimentação: avança e gira aleatoriamente
+            ahead(100);
+            turnGunRight(360);
+            back(100);
+            turnGunLeft(360);
+        }
+    }
+
+    public void onScannedRobot(ScannedRobotEvent e) {
+        // Calcula o ângulo para o inimigo
+        double angleToEnemy = getHeadingRadians() + e.getBearingRadians();
+
+        // Calcula a posição do inimigo
+        double enemyX = getX() + e.getDistance() * Math.sin(angleToEnemy);
+        double enemyY = getY() + e.getDistance() * Math.cos(angleToEnemy);
+
+        // Gira a mira para a posição do inimigo
+        turnGunRightRadians(Math.atan2(enemyX - getX(), enemyY - getY()) - getGunHeadingRadians());
+
+        // Dispara um tiro
+        fire(3);
+    }
+
+    public void onHitByBullet(HitByBulletEvent e) {
+        // Quando for atingido por um tiro, recua e gira para desviar
+        back(50);
+        turnRight(90);
+    }
+
+    public void onHitWall(HitWallEvent e) {
+        // Quando atingir a parede, gira para tentar escapar
+        turnRight(90);
+    }
+}
