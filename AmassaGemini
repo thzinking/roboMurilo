@@ -1,0 +1,83 @@
+import java.awt.Color;
+
+public class AmassaGemini extends Robot {
+
+    // Robot speed
+    private final double SPEED = 5;
+
+    // Fire power
+    private final double FIRE_POWER = 3;
+
+    // Respawn counter (simulates lives)
+    private int lives = 3;
+
+    // Radar range for enemy detection
+    private final double RADAR_RANGE = 400;
+
+    // Enemy data to track closest enemy
+    private RobotData nearestEnemy;
+
+    public void run() {
+        // Set robot name to "AmassaGemini"
+        setNames("AmassaGemini");
+
+        // Set body color to red
+        setBodyColor(Color.RED);
+
+        // Set radar range and turn it continuously
+        setRadarRange(RADAR_RANGE);
+        setTurnRadarRight(RADAR_RANGE);
+
+        // Infinite loop for continuous operation
+        while (true) {
+            // Update enemy data and find closest enemy
+            nearestEnemy = getScannedRobotInfo();
+
+            // Check for enemy and move sideways to avoid shots
+            if (nearestEnemy != null) {
+                // Enemy detected! Move away from it
+                double enemyX = nearestEnemy.getX();
+                double enemyY = nearestEnemy.getY();
+                double angleToEnemy = getHeadingTo(enemyX, enemyY);
+                double escapeAngle = normalizeAngle(angleToEnemy + 90); // Move perpendicular to enemy
+                setTurnRight(escapeAngle - getHeading());
+                setAhead(SPEED); // Move forward (sideways)
+            } else {
+                // No enemy detected, turn radar and move randomly
+                setTurnRight(45); // Turn radar continuously
+                setMove(SPEED * (Math.random() - 0.5)); // Random movement for exploration
+            }
+
+            // Fire continuously (simulates high firing rate)
+            fire(FIRE_POWER);
+
+            // Execute actions
+            execute();
+
+            // Check for death (bullet hit) and respawn if needed (lives > 0)
+            if (getEnergy() == 0 && lives > 0) {
+                lives--;
+                // Respawn logic (reset position and energy)
+                setX(Math.random() * getBattleFieldWidth());
+                setY(Math.random() * getBattleFieldHeight());
+                setEnergy(100); // Adjust initial energy if needed
+            }
+        }
+    }
+
+    // Normalize angle to be between -180 and 180 degrees
+    public double normalizeAngle(double angle) {
+        while (angle > 180) {
+            angle -= 360;
+        }
+        while (angle < -180) {  
+            angle += 360;
+        }
+        return angle;
+    }
+
+    // This method is called whenever the robot is hit by a bullet
+    public void onHitByBullet(BulletHitEvent event) {
+        // Simulate indestructibility by ignoring damage
+    }
+}
