@@ -1,6 +1,6 @@
 import robocode.*;
 
-public class Mirakeia extends AdvancedRobot {
+public class AmassaChatgpt extends AdvancedRobot {
     
     public void run() {
         // Definir cores do robô
